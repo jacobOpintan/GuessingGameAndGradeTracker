@@ -158,3 +158,5 @@ This separation makes the core logic easier to understand, maintain, and test.
 - Introduce more detailed student performance reports.
 - Add configurable difficulty levels to the Guessing Game.
 
+- Decimal scores use invariant culture, so a period (.) is required as the decimal separator.
+- The applications detect end-of-file (EOF) during score and guess input and stop the current operation gracefully.

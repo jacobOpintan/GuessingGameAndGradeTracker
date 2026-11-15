@@ -27,7 +27,10 @@ public class Game
         while (gameService.AttemptsRemaining > 0 &&
                !gameService.HasGuessedCorrectly)
         {
-            int guess = GetValidGuess();
+            if (!TryGetValidGuess(out int guess))
+            {
+                return;
+            }
 
             GuessResult result = gameService.MakeGuess(guess);
 
@@ -47,29 +50,38 @@ public class Game
         Console.WriteLine($"You have {MaximumAttempts} attempts.");
     }
 
-    private int GetValidGuess()
+    
+private bool TryGetValidGuess(out int guess)
+{
+    guess = 0;
+
+    while (true)
     {
-        while (true)
+        Console.Write("Enter your guess (1-100): ");
+
+        string? input = Console.ReadLine();
+
+        if (input is null)
         {
-            Console.Write("\nEnter your guess: ");
-
-            string? input = Console.ReadLine();
-
-            if (!int.TryParse(input, out int guess))
-            {
-                Console.WriteLine("Invalid input. Enter a whole number.");
-                continue;
-            }
-
-            if (guess < MinimumNumber || guess > MaximumNumber)
-            {
-                Console.WriteLine("Enter a number between 1 and 100.");
-                continue;
-            }
-
-            return guess;
+            Console.WriteLine("\nInput stream closed.");
+            return false;
         }
+
+        if (!int.TryParse(input, out guess))
+        {
+            Console.WriteLine("Invalid input. Enter a number.");
+            continue;
+        }
+
+        if (guess < 1 || guess > 100)
+        {
+            Console.WriteLine("Guess must be between 1 and 100.");
+            continue;
+        }
+
+        return true;
     }
+}
 
     private void DisplayGuessResult(
         GuessResult result,

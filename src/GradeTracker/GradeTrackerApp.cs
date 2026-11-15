@@ -1,4 +1,4 @@
-
+using System.Globalization;
 namespace GradeTracker;
 
 public class GradeTrackerApp
@@ -97,7 +97,10 @@ public class GradeTrackerApp
             return;
         }
 
-        decimal score = GetValidScore();
+        if (!TryGetValidScore(out decimal score))
+        {
+            return;
+        }
 
         _studentNames[_studentCount] = name.Trim();
         _studentScores[_studentCount] = score;
@@ -107,29 +110,37 @@ public class GradeTrackerApp
         Console.WriteLine("Student added successfully!");
     }
 
-    private decimal GetValidScore()
+    private bool TryGetValidScore(out decimal score)
+{
+    score = 0;
+
+    while (true)
     {
-        while (true)
+        Console.Write("Enter student score (0-100): ");
+
+        string? input = Console.ReadLine();
+
+        if (input is null)
         {
-            Console.Write("Enter student score (0-100): ");
-
-            string? input = Console.ReadLine();
-
-            if (!decimal.TryParse(input, out decimal score))
-            {
-                Console.WriteLine("Invalid input. Enter a valid score.");
-                continue;
-            }
-
-            if (score < 0 || score > 100)
-            {
-                Console.WriteLine("Score must be between 0 and 100.");
-                continue;
-            }
-
-            return score;
+            Console.WriteLine("\nInput stream closed.");
+            return false;
         }
+
+        if (!decimal.TryParse(input,NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign |NumberStyles.AllowLeadingWhite| NumberStyles.AllowTrailingWhite,CultureInfo.InvariantCulture, out score))
+        {
+            Console.WriteLine("Invalid input. Enter a valid score.");
+            continue;
+        }
+
+        if (score < 0 || score > 100)
+        {
+            Console.WriteLine("Score must be between 0 and 100.");
+            continue;
+        }
+
+        return true;
     }
+}
 
     private void DisplayStudentResults()
     {
